@@ -2563,7 +2563,7 @@ const TARGET_MINTS = [
   "8Ki8DpuWNxu9VsS3kQbarsCWMcFGWkzzA8pUPto9zBd5", //LOCKIN
   "2oGLxYuNBJRcepT1mEV6KnETaLD7Bf6qq3CM6skasBfe", //PUPS
   "kinXdEcpDQeHPEuQnqmUgtYykqKGVFq6CeVX5iAHJq6", //KIN
-  "kinXdEcpDQeHPEuQnqmUgtYykqKGVFq6CeVX5iAHJq6", //dogwifhat
+  "EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm", //dogwifhat
   "CLoUDKc4Ane7HeQcPpE3YHnznRxhMimJ4MyaUqyHFzAu", //cloud
   "ATLASXmbPQxBUYbxPsV97usA3fPQYEqzQBUHgiFCUsXx", //Star Atlas
   "28tVhteKZkzzWjrdHGXzxfm4SQkhrDrjLur9TYCDVULE", //BUU

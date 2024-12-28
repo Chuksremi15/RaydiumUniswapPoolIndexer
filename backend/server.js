@@ -1,10 +1,16 @@
 import express from "express";
+import "dotenv/config";
 import cors from "cors";
 import { PORT } from "./constant.js";
 import raydium from "./raydium/router.js";
 import uniswap from "./uniswap/router.js";
+import { connectToDatabase } from "./db.js";
+
+connectToDatabase();
 
 const app = express();
+
+// Database connection configuration
 
 const corsOptions = {
   origin: "*",

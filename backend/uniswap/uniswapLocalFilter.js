@@ -28,7 +28,7 @@ export function interpretSwapEvent(
 
     // Convert amounts to decimal format (assuming 18 decimals)
     const decimals = 18;
-    const formatAmount = (value) => Number(value) / 10 ** decimals;
+    //const formatAmount = (value) => Number(value) / 10 ** decimals;
 
     return {
       blockNumber,

@@ -1,5 +1,6 @@
 import express from "express";
 import { interpretSwapEvent } from "./uniswapLocalFilter.js";
+import { MAX_LOGS } from "../constant.js";
 const router = express.Router();
 
 // Store swap event logs

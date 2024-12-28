@@ -36,3 +36,18 @@
     owner: "MfDuWeqSHEqTFVYZ7LoexgAK9dxk7cy4DFJWjWMGVWa",
   },
 ];
+
+[
+  {
+    transactionType: "BUY",
+    timeCreated: 1735396577970,
+    baseTokenAddr: [
+      "So11111111111111111111111111111111111111112",
+      "So11111111111111111111111111111111111111111",
+    ],
+    tokenAddr: "GJAFwWjJ3vnTsrQVabjBVK2TYB1YtRCQXRDfDgUnpump",
+    baseTokenChange: -1.3380400860005466,
+    tokenChange: 871.0435330001637,
+    owner: "MfDuWeqSHEqTFVYZ7LoexgAK9dxk7cy4DFJWjWMGVWa",
+  },
+];

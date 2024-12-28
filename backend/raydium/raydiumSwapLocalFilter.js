@@ -7,7 +7,10 @@ export const filterRaydiumSwap = (array) => {
   const decryptedData = {
     transactionType: "",
     timeCreated: 0,
-    baseTokenAddr: "",
+    baseTokenAddr: [
+      "So11111111111111111111111111111111111111112",
+      "So11111111111111111111111111111111111111111",
+    ],
     tokenAddr: "",
     baseTokenChange: 0,
     tokenChange: 0,
@@ -30,7 +33,6 @@ export const filterRaydiumSwap = (array) => {
       wrappedSolAddress.includes(mint) &&
       (change > 0.0001 || change < -0.0001)
     ) {
-      decryptedData.baseTokenAddr = wrappedSolAddress;
       decryptedData.baseTokenChange += change;
     }
 
