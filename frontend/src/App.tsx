@@ -1,14 +1,13 @@
-import React from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-import EthPoolIndexer from "./pages/EthPoolIndexer";
-import SolPoolIndexer from "./pages/SolPoolIndexer";
+import UniswapPoolsIndexer from "./pages/UniswapPoolsIndexer";
+import RaydiumPoolIndexer from "./pages/RaydiumPoolIndexer";
 
 const App = () => {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<EthPoolIndexer />} />
-        <Route path="/solana" element={<SolPoolIndexer />} />
+        <Route path="/" element={<RaydiumPoolIndexer />} />
+        <Route path="/uniswap" element={<UniswapPoolsIndexer />} />
       </Routes>
     </Router>
   );

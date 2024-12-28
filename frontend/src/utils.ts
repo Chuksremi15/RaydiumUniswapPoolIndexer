@@ -1,5 +1,5 @@
 import { ethers, formatUnits } from "ethers";
-import { PoolData } from "./pages/EthPoolIndexer";
+import { PoolData } from "./pages/UniswapPoolsIndexer";
 
 const UNISWAP_V3_POOL_ABI = [
   "function slot0() external view returns (uint160 sqrtPriceX96, int24 tick, uint16 observationIndex, uint16 observationCardinality, uint16 observationCardinalityNext, uint8 feeProtocol, bool unlocked)",
@@ -188,3 +188,77 @@ export async function getPriceAndMarketCapV3(
 //     time: Date.now(),
 //   };
 // }
+
+export const LOCAL_URL = "http://localhost:3000";
+
+export const TARGET_MINTS = [
+  {
+    value: "",
+    label: "Select a meme",
+  },
+  {
+    value: "Df6yfrKC8kZE3KNkrHERKzAetSxbrWeniQfyJY4Jpump",
+    label: "CHILLGUY",
+  },
+  { value: "2qEHjDLDLbuBgRYvsxhc5D6uDWAivNFZGan56P1tpump", label: "Pnut" },
+  { value: "CzLSujWBLFsSjncfkh59rUFqvafWcY5tzedWJSuypump", label: "GOAT" },
+  { value: "8x5VqbHA8D7NkD52uNuS5nnt3PwA8pLD34ymskeSo2Wn", label: "ZEREBRO" },
+  { value: "MEW1gQWJ3nEXg2qgERiKu7FAFj79PHvQVREQUzScPP5", label: "MEW" },
+  { value: "ukHH6c7mMyiWCf1b9pnWe25TSpkDDt3H5pQZgZ74J82", label: "BOME" },
+  {
+    value: "7atgF8KQo4wJrD5ATGX7t1V2zVvykPJbFfNeVf1icFv1",
+    label: "catwifhat",
+  },
+  { value: "GJAFwWjJ3vnTsrQVabjBVK2TYB1YtRCQXRDfDgUnpump", label: "ACT" },
+  { value: "ED5nyyWEzpPPiWimP8vYm7sD7TD3LAt3Q3gRTWHzPJBY", label: "MOODENG" },
+  { value: "8Ki8DpuWNxu9VsS3kQbarsCWMcFGWkzzA8pUPto9zBd5", label: "LOCKIN" },
+  { value: "2oGLxYuNBJRcepT1mEV6KnETaLD7Bf6qq3CM6skasBfe", label: "PUPS" },
+  { value: "kinXdEcpDQeHPEuQnqmUgtYykqKGVFq6CeVX5iAHJq6", label: "KIN" },
+  {
+    value: "EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm",
+    label: "dogwifhat",
+  },
+  { value: "CLoUDKc4Ane7HeQcPpE3YHnznRxhMimJ4MyaUqyHFzAu", label: "cloud" },
+  {
+    value: "ATLASXmbPQxBUYbxPsV97usA3fPQYEqzQBUHgiFCUsXx",
+    label: "Star Atlas",
+  },
+  { value: "28tVhteKZkzzWjrdHGXzxfm4SQkhrDrjLur9TYCDVULE", label: "BUU" },
+  { value: "9psiRdn9cXYVps4F1kFuoNjd2EtmqNJXrCPmRppJpump", label: "UBC" },
+];
+
+export const getSolanaTokenName = (addr: string) => {
+  const tokenInfo = TARGET_MINTS.filter(({ value }) => {
+    return addr.toLowerCase() === value.toLowerCase();
+  });
+  return tokenInfo[0].label;
+};
+
+export const formatTimestamp = (timestamp: number) => {
+  const now = Date.now();
+  const elapsedMs = now - timestamp;
+
+  const seconds = Math.floor(elapsedMs / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+  const weeks = Math.floor(days / 7);
+  const months = Math.floor(days / 30);
+  const years = Math.floor(days / 365);
+
+  if (seconds < 60) {
+    return `${seconds} second${seconds !== 1 ? "s" : ""} ago`;
+  } else if (minutes < 60) {
+    return `${minutes} minute${minutes !== 1 ? "s" : ""} ago`;
+  } else if (hours < 24) {
+    return `${hours} hour${hours !== 1 ? "s" : ""} ago`;
+  } else if (days < 7) {
+    return `${days} day${days !== 1 ? "s" : ""} ago`;
+  } else if (weeks < 4) {
+    return `${weeks} week${weeks !== 1 ? "s" : ""} ago`;
+  } else if (months < 12) {
+    return `${months} month${months !== 1 ? "s" : ""} ago`;
+  } else {
+    return `${years} year${years !== 1 ? "s" : ""} ago`;
+  }
+};

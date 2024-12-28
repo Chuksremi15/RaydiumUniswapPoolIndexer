@@ -1,13 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { getPriceAndMarketCapV2 } from "../utils";
+import { LOCAL_URL, formatTimestamp, getPriceAndMarketCapV2 } from "../utils";
 import { ethers, formatUnits } from "ethers";
 import { AddressDisplay } from "../components/AddressDisplay";
-import { Link } from "react-router-dom";
-import SwapIndexer from "./SolPoolIndexer";
 
-const LOCAL_URL = "http://localhost:3000";
+import { Nav } from "../components/Nav";
 
 const CHAINLINK_ETH_USD_PRICE_FEED =
   "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419"; // Ethereum Mainnet ETH/USD Price Feed
@@ -34,7 +32,7 @@ const fetchUserData = async (poolAddress: string) => {
 };
 
 // Define the type for each interpreted swap event
-type SwapEvent = {
+export type SwapEvent = {
   blockNumber: number;
   transactionHash: string;
   contractAddress: string;
@@ -226,10 +224,7 @@ function EthPoolIndexer() {
   return (
     <div className="bg-dark font-body h-screen">
       <div className="h-screen font-body container mx-auto text-white flex flex-col gap-y-6 py-10">
-        <h1 className="text-xl text-white">Uniswap V2 Pool Indexer</h1>
-        <Link to="/solana">
-          <h1 className="text-xl text-white">Go to Raydium pool</h1>
-        </Link>
+        <Nav />
 
         <div className="flex items-center w-[350px] relative mx-auto">
           <input
@@ -295,7 +290,7 @@ function EthPoolIndexer() {
                     [...swapEvents].reverse().map((data, index) => (
                       <tr key={index} className="hover:bg-gray-750 transition">
                         <td className="px-4 py-4 text-gray">
-                          <div>12:34 PM</div>
+                          <div>{formatTimestamp(data.timeCreated)}</div>
                         </td>
                         {data.transactionType === "BUY" ? (
                           <td className="px-4 py-4">
