@@ -1,16 +1,15 @@
-import { Connection, PublicKey } from "@solana/web3.js";
 import { useState } from "react";
-import { PoolData } from "./UniswapPoolsIndexer";
 import { AddressDisplay } from "../components/AddressDisplay";
 import { Nav } from "../components/Nav";
 import {
-  LOCAL_URL,
   TARGET_MINTS,
   formatTimestamp,
+  getPriceInSol,
   getSolanaTokenName,
+  getValueSolUsd,
 } from "../utils";
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
+import { fetchSolPrice, fetchSwaps, fetchTokenData } from "../api";
 
 // Define the type for each interpreted swap event
 export type RaydiumSwapEvent = {
@@ -24,65 +23,49 @@ export type RaydiumSwapEvent = {
 };
 
 const SolPoolIndexer = () => {
-  const [swapEvents, setSwapEvents] = useState<RaydiumSwapEvent[]>([]);
-
-  const [poolLoading, setPoolLoading] = useState<boolean>(true);
-
-  const [poolData, setPoolData] = useState<PoolData>({
-    poolType: "Uniswap V2",
-    poolAddress: "",
-    prices: {
-      token0: 0,
-    },
-    marketCapsUSD: {
-      TOKEN0: 0,
-      TOKEN1: 0,
-    },
-    reserves: {
-      TOKEN0: 0,
-      TOKEN1: 0,
-    },
-    totalSupply: 0,
-    totalLiquidity: 0,
-    tokens: {
-      token0: {
-        address: "",
-        symbol: "",
-        decimals: 0,
-      },
-      token1: {
-        address: "",
-        decimals: 0,
-        symbol: "",
-      },
-    },
-  });
-
   const [inputVal, setInputVal] = useState("");
 
-  const fetchUserData = async (tokenAddress: string) => {
-    if (!tokenAddress) throw new Error("Address is required");
-    const { data } = await axios.get(
-      `${LOCAL_URL}/raydium/getswaps/${tokenAddress}`
-    );
-    return data;
-  };
-
-  const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["user", inputVal], // Query key includes inputVal
-    queryFn: () => fetchUserData(inputVal), // Fetch function
-    enabled: !!inputVal, // Automatically runs when inputVal is non-empty
-    refetchInterval: 5000, // Refetch every 5000 milliseconds (5 seconds)
+  const {
+    data: tokenData,
+    isLoading: istokenDataLoading,
+    isError: istokenDataIsError,
+    error: tokenDataError,
+  } = useQuery({
+    queryKey: [inputVal, "tokenData"], // Query key includes inputVal
+    queryFn: () => fetchTokenData(inputVal), // Fetch function
+    enabled: !!inputVal,
+    refetchInterval: false,
   });
 
-  console.log("data", data);
+  console.log("tokenData", tokenData);
+
+  const {
+    data: solPrice,
+    isLoading: isSolPriceLoading,
+    isError: isSolPriceIsError,
+    error: solPriceError,
+  } = useQuery({
+    queryKey: [inputVal, "solPrice"], // Query key includes inputVal
+    queryFn: () => fetchSolPrice(), // Fetch function
+    enabled: true,
+    refetchInterval: 90000,
+  });
+
+  console.log("sol Price", solPrice);
+
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: [inputVal, "user"], // Query key includes inputVal
+    queryFn: () => fetchSwaps(inputVal), // Fetch function
+    enabled: !!inputVal, // Automatically runs when inputVal is non-empty
+    refetchInterval: 5000,
+  });
 
   return (
-    <div className="bg-dark font-body h-screen">
-      <div className="h-screen font-body container mx-auto text-white flex flex-col gap-y-6 py-10">
+    <div className="bg-dark font-body h-screen overflow-scroll ">
+      <div className="h-screen font-body container mx-auto text-white flex flex-col gap-y-2 py-10">
         <Nav />
 
-        <div className="flex items-center w-[350px] relative mx-auto">
+        <div className="flex items-center w-[350px] relative mx-auto mb-2">
           <select
             className="input text-sm text-white bg-tablebg rounded-xl border-gray2 h-14 focus:outline-0 focus:gray2 w-[350px] mx-auto focus:text-sm pl-4 pr-12 border placeholder:text-sm transition-all duration-300"
             value={inputVal}
@@ -97,7 +80,7 @@ const SolPoolIndexer = () => {
           </select>
         </div>
 
-        <div className="flex gap-x-6 justify-between mx-auto w-full">
+        <div className="flex gap-x-6 justify-between mx-auto w-full pb-20">
           <div className="bg-tablebg rounded-lg shadow-lg w-full">
             <table className="w-full text-sm text-left">
               <thead className="border-b border-gray2 text-gray2">
@@ -107,6 +90,9 @@ const SolPoolIndexer = () => {
                   </th>
                   <th scope="col" className="px-4 py-3 font-normal ">
                     Type
+                  </th>
+                  <th scope="col" className="px-4 py-3 font-normal ">
+                    USD
                   </th>
                   <th scope="col" className="px-4 py-3 font-normal ">
                     {inputVal && getSolanaTokenName(inputVal)}
@@ -128,14 +114,9 @@ const SolPoolIndexer = () => {
                     [...data.data].reverse().map((data, index) => (
                       <tr key={index} className="hover:bg-gray-750 transition">
                         <td className="px-4 py-4 text-gray">
-                          <div
-                            onClick={() => {
-                              console.log(data, "data");
-                            }}
-                          >
-                            {formatTimestamp(data.time_created)}
-                          </div>
+                          <div>{formatTimestamp(data.time_created)}</div>
                         </td>
+
                         {data.transaction_type === "BUY" ? (
                           <>
                             <td className="px-4 py-4">
@@ -144,12 +125,37 @@ const SolPoolIndexer = () => {
                               </div>
                             </td>
                             <td className="px-4 py-4 text-green">
-                              <div>{data.token_change}</div>
+                              <div>
+                                {Math.abs(
+                                  getValueSolUsd(
+                                    solPrice,
+                                    data.base_token_change
+                                  )
+                                ).toFixed(6)}
+                              </div>
                             </td>
                             <td className="px-4 py-4 text-green">
-                              <div> {data.base_token_change}</div>
+                              <div>
+                                {Math.abs(
+                                  parseFloat(data.token_change)
+                                ).toFixed(6)}
+                              </div>
                             </td>
-                            <td className="px-4 py-4 text-green">$40,000</td>
+                            <td className="px-4 py-4 text-green">
+                              <div>
+                                {" "}
+                                {Math.abs(
+                                  parseFloat(data.base_token_change)
+                                ).toFixed(6)}
+                              </div>
+                            </td>
+
+                            <td className="px-4 py-4 text-green">
+                              {getPriceInSol(
+                                data.base_token_change,
+                                data.token_change
+                              ).toFixed(6)}
+                            </td>
                           </>
                         ) : (
                           <>
@@ -159,15 +165,34 @@ const SolPoolIndexer = () => {
                               </div>
                             </td>
                             <td className="px-4 py-4 text-[#F094A4]">
-                              <div>{data.token_change}</div>
+                              <div>
+                                {Math.abs(
+                                  getValueSolUsd(193, data.base_token_change)
+                                ).toFixed(6)}
+                              </div>
+                            </td>
+                            <td className="px-4 py-4 text-[#F094A4]">
+                              <div>
+                                {Math.abs(
+                                  parseFloat(data.token_change)
+                                ).toFixed(6)}
+                              </div>
                             </td>
 
                             <td className="px-4 py-4 text-[#F094A4]">
-                              <div> {data.base_token_change}</div>
+                              <div>
+                                {" "}
+                                {Math.abs(
+                                  parseFloat(data.base_token_change)
+                                ).toFixed(6)}
+                              </div>
                             </td>
 
                             <td className="px-4 py-4 text-[#F094A4]">
-                              $40,000
+                              {getPriceInSol(
+                                data.base_token_change,
+                                data.token_change
+                              ).toFixed(6)}
                             </td>
                           </>
                         )}
@@ -182,54 +207,48 @@ const SolPoolIndexer = () => {
           </div>
 
           <div className="flex flex-col gap-y-4">
-            <div className="bg-tablebg font-body p-4 rounded-lg  w-[400px] h-[200px]">
-              <p className="text-ash text-base mb-4">Token info</p>
+            <div className="bg-tablebg font-body py-4 rounded-lg  w-[400px] ">
+              <p className="text-ash text-base mb-2 px-4">Token info</p>
 
-              {!poolLoading && poolData && (
-                <div className="flex flex-col gap-y-4">
-                  <div className="flex justify-between ">
-                    <p className="text-gray2 text-sm">Price</p>
-                    <p className="text-ash text-sm">{poolData.prices.token0}</p>
-                  </div>
-                  <div className="flex justify-between ">
-                    <p className="text-gray2 text-sm">Total supply</p>
-                    <p className="text-ash text-sm">{poolData.totalSupply}</p>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <p className="text-gray2 text-sm">Pair</p>
-                    <AddressDisplay address={poolData.tokens.token0.address} />
-                  </div>
-                  <div className="flex justify-between ">
-                    <p className="text-gray2 text-sm">Token symbol</p>
-                    <p className="text-ash text-sm">
-                      {poolData.tokens.token0.symbol}
-                    </p>
-                  </div>
+              {istokenDataLoading ? (
+                <div className="py-16 flex items-center justify-center w-full">
+                  <div className="h-6 w-6 border-2 border-white border-t-transparent rounded-full animate-spin " />
                 </div>
-              )}
-            </div>
-            <div className="bg-tablebg font-body p-4 rounded-lg  w-[400px] h-[200px]">
-              <p className="text-ash text-base mb-4">Pool info</p>
-
-              {!poolLoading && poolData && (
-                <div className="flex flex-col gap-y-4">
-                  <div className="flex justify-between ">
-                    <p className="text-gray2 text-sm">Pool Type</p>
-                    <p className="text-ash text-sm">{poolData.poolType}</p>
+              ) : (
+                tokenData && (
+                  <div>
+                    <div className="h-[350px] mb-4">
+                      <img
+                        className="h-full w-full object-cover object-center rounded-lg"
+                        src={tokenData.metaData.image}
+                      />
+                    </div>
+                    <div className="flex flex-col gap-y-2 px-4">
+                      <div className="flex justify-between ">
+                        <p className="text-gray2 text-sm">Name</p>
+                        <p className="text-ash text-sm">
+                          {tokenData.metaData.name}
+                        </p>
+                      </div>
+                      <div className="flex justify-between ">
+                        <p className="text-gray2 text-sm">Total supply</p>
+                        <p className="text-ash text-sm">
+                          {tokenData.totalsupply}
+                        </p>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <p className="text-gray2 text-sm">Pair</p>
+                        <AddressDisplay address={inputVal} />
+                      </div>
+                      <div className="flex justify-between ">
+                        <p className="text-gray2 text-sm">Token symbol</p>
+                        <p className="text-ash text-sm">
+                          {tokenData.metaData.symbol}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex justify-between ">
-                    <p className="text-gray2 text-sm">Address</p>
-                    <AddressDisplay address={poolData.poolAddress} />
-                  </div>
-                  <div className="flex justify-between ">
-                    <p className="text-gray2 text-sm">Token creator</p>
-                    <p className="text-ash text-sm">FqD1C...7rF</p>
-                  </div>
-                  <div className="flex justify-between ">
-                    <p className="text-gray2 text-sm">Pool created </p>
-                    <p className="text-ash text-sm">12/21/2024 23:52</p>
-                  </div>
-                </div>
+                )
               )}
             </div>
           </div>

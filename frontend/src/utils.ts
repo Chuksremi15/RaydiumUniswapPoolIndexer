@@ -262,3 +262,13 @@ export const formatTimestamp = (timestamp: number) => {
     return `${years} year${years !== 1 ? "s" : ""} ago`;
   }
 };
+
+export const getPriceInSol = (
+  base_token_change: string,
+  token_change: string
+) => {
+  return Math.abs(parseFloat(base_token_change) / parseFloat(token_change));
+};
+export const getValueSolUsd = (solPrice: number, sol: string) => {
+  return Math.abs(solPrice * parseFloat(sol));
+};

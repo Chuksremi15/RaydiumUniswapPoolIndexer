@@ -46,6 +46,7 @@ export type SwapEvent = {
   };
   tokenPrice: number;
   transactionType: string;
+  timeCreated: number;
 };
 
 interface TokenData {
@@ -191,11 +192,9 @@ function EthPoolIndexer() {
 
   useEffect(() => {
     if (data && data.data.length > 0) {
-      // setSwapEvents((prev) => {
-      //   const existingIds = new Set(prev.map((item) => item.id)); // Collect existing IDs
-      //   const newEvents = data.data.filter((item) => !existingIds.has(item.id)); // Filter new items
-      //   return [...prev, ...newEvents]; // Add only unique items
-      // });
+      setSwapEvents((prev) => {
+        return [...prev, ...data.data];
+      });
 
       console.log("data", data.data);
       console.log("swaps", swapEvents);
