@@ -10,6 +10,7 @@ import {
 } from "../utils";
 import { useQuery } from "@tanstack/react-query";
 import { fetchSolPrice, fetchSwaps, fetchTokenData } from "../api";
+import { Icons } from "./Icons";
 
 // Define the type for each interpreted swap event
 export type RaydiumSwapEvent = {
@@ -246,6 +247,8 @@ const SolPoolIndexer = () => {
                           {tokenData.metaData.symbol}
                         </p>
                       </div>
+
+                      <Icons metadata={tokenData.metaData} />
                     </div>
                   </div>
                 )
