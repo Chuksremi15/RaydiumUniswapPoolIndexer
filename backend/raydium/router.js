@@ -2,6 +2,7 @@ import express from "express";
 import { filterRaydiumSwap } from "./raydiumSwapLocalFilter.js";
 import { MAX_LOGS } from "../constant.js";
 import { client } from "../db.js";
+import { getTokenMetadata } from "./getTokenMetadata.js";
 
 const router = express.Router();
 
@@ -110,6 +111,32 @@ router.get("/getswaps/:tokenAddress", async (req, res) => {
   }
 });
 
-//tokenSwapsArray.some((obj) => obj.timeCreated === data.timeCreated)
+//end point to retrieve token metadata
+router.get("/getmetadata/:tokenAddress", async (req, res) => {
+  try {
+    const { tokenAddress } = req.params;
+
+    if (!tokenAddress) {
+      return res.status(400).json({ error: "token address required" });
+    }
+
+    const metaData = await getTokenMetadata(tokenAddress);
+
+    return res.status(200).json({
+      status: "success",
+      message: "metadata fetched successfully",
+      data: metaData,
+    });
+  } catch (err) {
+    console.error("Error retrieving data:", err.message);
+
+    // Send a 500 error response with error details
+    return res.status(500).json({
+      status: "error",
+      message: "Failed to retrieve data",
+      error: err.message,
+    });
+  }
+});
 
 export default router;
