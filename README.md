@@ -6,11 +6,11 @@ This project utilizes a quick node stream to track mint/swap on Raydium and the 
 
 ### Requirement
 
-Node.js (v18 or later) and npm installed
-TypeScript (latest version) and ts-node installed
-Ngrok for exposing your local server publicly
-PostgreSQL
-React
+1. Node.js (v18 or later) and npm installed
+2. TypeScript (latest version) and ts-node installed
+3. Ngrok for exposing your local server publicly
+4. PostgreSQL
+5. React
 
 ### Get started
 
