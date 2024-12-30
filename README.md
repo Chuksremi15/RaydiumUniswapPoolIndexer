@@ -4,6 +4,8 @@
 
 This project utilizes a quick node stream to track mint/swap on Raydium and the Uniswap pool. The project flow involves getting this stream from Quicknode, doing some data filtering, sending the stream to our Nodejs backend via webhook, doing some more filtering, and storing it in a postGreSQL database. It also involves creating API routes, calling these routes, and displaying data from and on a React frontend.
 
+[Link to live version](https://youtu.be/GupWsz-tukI?si=QaxWFLp3fGFDQEJp)
+
 ### Requirement
 
 1. Node.js (v18 or later) and npm installed
